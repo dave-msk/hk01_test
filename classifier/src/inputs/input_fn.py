@@ -1,3 +1,23 @@
+# Copyright 2017 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+This file is inspired from preprocessing code from the repository
+"tensorflow/models/official/resnet/".
+
+The copyright and license block is preserved to fulfill license requirement.
+Credits go to The TensorFlow Authors.
+"""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -8,11 +28,13 @@ from functools import partial
 import tensorflow as tf
 
 
+# Taken from "tensorflow/models/official/resnet/imagenet_main.py", and modified.
 def get_filenames(is_training, data_dir):
   filename = 'train' if is_training else 'test'
   return [os.path.join(data_dir, '%s.tfrecords' % filename)]
 
 
+# Taken from "tensorflow/models/official/resnet/imagenet_main.py", and modified.
 def _parse_example_proto(example_serialized, voc_size):
   feature_map = {
       'label': tf.FixedLenFeature([1], dtype=tf.int64,
@@ -27,6 +49,7 @@ def _parse_example_proto(example_serialized, voc_size):
   return features['feature'], label
 
 
+# Taken from "tensorflow/models/official/resnet/imagenet_main.py", and modified.
 def parse_record(raw_record, voc_size):
   feature, label = _parse_example_proto(raw_record, voc_size)
 
@@ -34,6 +57,8 @@ def parse_record(raw_record, voc_size):
   return feature, label
 
 
+# Taken from "tensorflow/models/official/resnet/resnet_run_loop.py",
+# and modified.
 def process_record_dataset(dataset, is_training, batch_size, shuffle_buffer,
                            parse_record_fn, num_epochs=1):
   dataset = dataset.prefetch(buffer_size=batch_size)
@@ -53,6 +78,7 @@ def process_record_dataset(dataset, is_training, batch_size, shuffle_buffer,
   return dataset
 
 
+# Taken from "tensorflow/models/official/resnet/imagenet_main.py", and modified.
 def input_fn(is_training, data_dir, voc_size, batch_size,
              shuffle_buffer=2000, num_epochs=1):
   filenames = get_filenames(is_training, data_dir)
