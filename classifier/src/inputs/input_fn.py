@@ -79,23 +79,25 @@ def process_record_dataset(dataset, is_training, batch_size, shuffle_buffer,
 
 
 # Taken from "tensorflow/models/official/resnet/imagenet_main.py", and modified.
-def input_fn(is_training, data_dir, voc_size, batch_size,
-             shuffle_buffer=2000, num_epochs=1):
-  filenames = get_filenames(is_training, data_dir)
-  dataset = tf.data.Dataset.from_tensor_slices(filenames)
+def get_input_fn(is_training, data_dir, voc_size, batch_size,
+                 shuffle_buffer=2000, num_epochs=1):
+  def input_fn():
+    filenames = get_filenames(is_training, data_dir)
+    dataset = tf.data.Dataset.from_tensor_slices(filenames)
 
-  if is_training:
-    dataset = dataset.shuffle(buffer_size=len(filenames))
+    if is_training:
+      dataset = dataset.shuffle(buffer_size=len(filenames))
 
-  dataset = dataset.apply(tf.contrib.data.parallel_interleave(
-      tf.data.TFRecordDataset, cycle_length=10))
+    dataset = dataset.apply(tf.contrib.data.parallel_interleave(
+        tf.data.TFRecordDataset, cycle_length=10))
 
-  parse_record_fn = partial(parse_record, voc_size=voc_size)
+    parse_record_fn = partial(parse_record, voc_size=voc_size)
 
-  return process_record_dataset(
-      dataset=dataset,
-      is_training=is_training,
-      batch_size=batch_size,
-      shuffle_buffer=shuffle_buffer,
-      parse_record_fn=parse_record_fn,
-      num_epochs=num_epochs)
+    return process_record_dataset(
+        dataset=dataset,
+        is_training=is_training,
+        batch_size=batch_size,
+        shuffle_buffer=shuffle_buffer,
+        parse_record_fn=parse_record_fn,
+        num_epochs=num_epochs)
+  return input_fn

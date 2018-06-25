@@ -17,8 +17,7 @@ import os
 import re
 from itertools import chain
 
-from inputs.preparation \
-    import transform_data_files, transformed_data_to_tfrecords
+from inputs.preparation import transform_data_files
 
 parser = argparse.ArgumentParser()
 
@@ -29,6 +28,10 @@ parser.add_argument('-tr', '--train', type=str, required=True,
 parser.add_argument('-ts', '--test', type=str, required=True,
                     help='Raw test file.',
                     metavar="<TS>")
+
+parser.add_argument('-v', '--valid', type=str, required=True,
+                    help='Raw validation file.',
+                    metavar='<V>')
 
 parser.add_argument('-d', '--out_dir', type=str, required=True,
                     help='Output directory for prepared files.',
@@ -49,15 +52,8 @@ def token_fn(text):
 def main(flags):
   if not os.path.isdir(flags.out_dir):
     os.makedirs(flags.out_dir)
-  tfm_train, tfm_test, voc_size = transform_data_files(
+  transform_data_files(
       flags.train, flags.test, flags.out_dir, token_fn, flags.voc_size)
-  tf_out_root = os.path.join(flags.out_dir, 'tf_records')
-  if not os.path.isdir(tf_out_root):
-    os.makedirs(tf_out_root)
-  tf_train_out = os.path.join(tf_out_root, 'train.tfrecords')
-  tf_test_out = os.path.join(tf_out_root, 'test.tfrecords')
-  transformed_data_to_tfrecords(tfm_train, voc_size, tf_train_out)
-  transformed_data_to_tfrecords(tfm_test, voc_size, tf_test_out)
 
 
 if __name__ == "__main__":

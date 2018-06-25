@@ -16,9 +16,6 @@
 import os
 from collections import Counter
 
-import numpy as np
-import tensorflow as tf
-
 from inputs.example_base import Example
 
 
@@ -92,22 +89,3 @@ def transform_data_files(train_file, test_file, out_dir,
 
   with open(label_out, 'w') as fout:
     [fout.write("%s\t%s\n" % (l, i)) for i, l in enumerate(idx_to_l)]
-
-  return train_out, test_out, len(idx_to_t) - 1
-
-
-def transformed_data_to_tfrecords(file, voc_size, out_file):
-  with open(file, 'r') as fin, tf.python_io.TFRecordWriter(out_file) as fout:
-    for line in fin:
-      l, seq = line.split('\t')
-      label = tf.train.Feature(int64_list=tf.train.Int64List(value=[int(l)]))
-      counter = Counter([int(t) for t in seq.split(' ')])
-      v = np.zeros(voc_size + 1)
-      for i, c in counter.most_common(): v[i] = c
-      v /= np.linalg.norm(v)
-      feature = tf.train.Feature(float_list=tf.train.FloatList(value=v))
-      example = tf.train.Example(features=tf.train.Features(feature={
-          'label': label,
-          'feature': feature}))
-
-      fout.write(example.SerializeToString())
