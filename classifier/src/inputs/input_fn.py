@@ -30,7 +30,7 @@ import tensorflow as tf
 
 # Taken from "tensorflow/models/official/resnet/imagenet_main.py", and modified.
 def get_filenames(is_training, data_dir):
-  filename = 'train' if is_training else 'test'
+  filename = 'train' if is_training else 'valid'
   return [os.path.join(data_dir, '%s.tfrecords' % filename)]
 
 
